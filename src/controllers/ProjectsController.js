@@ -7,6 +7,8 @@ const validator = require("../validation/projectValidator")
 const Op = Sequelize.Op
 //
 module.exports = {
+    //
+    // TODO: Add a status column in the projects table 
     createProject(projectInfo,result){
         //Validate post data
         const {error, isValid} = validator.create(projectInfo)
@@ -38,7 +40,7 @@ module.exports = {
     },
     getProjects(result){
         Projects.findAll({
-            attributes: ['name','description', 'purpose']
+            attributes: ['id','name','description', 'purpose']
         }).then(projects=>{
             result(null, projects)
         }).catch(err=>{
@@ -46,6 +48,24 @@ module.exports = {
         })
     },
     updateProject(updateInfo,result){
+        const {error, isValid}= validator.update(updateInfo)
+        if(isValid){
+            Projects.findByPk(updateInfo.projectId).then(foundProject=>{
+                if(foundProject!==null){
+                    foundProject.update({
+                        name: updateInfo.name,
+                        description: updateInfo.description,
+                        purpose: updateInfo.purpose
+                    }).then(updateSuccess=>{
+                        result(null,{message: "Project Update Successfull"})
+                    }).catch(error=>result({error: error},null))
+                }else{
+                    result({error:"Invalid project"},null)
+                }
+            }).catch(err=>result({error: err},null))
+        }else{
+            result({error:error},null)
+        }
 
     }
 }
