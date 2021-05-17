@@ -22,4 +22,13 @@ router.get("/all", (req,res)=>{
         }
     })
 })
+router.patch("/update", (req,res)=>{
+    ProjectsController.updateProject(req.body,(error,success)=>{
+        if(error){
+            res.status(400).json(error)
+        }else{
+            res.status(200).json(success)
+        }
+    })
+})
 module.exports = router
